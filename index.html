@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-amber-50/50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Marmitaria Caseira - Pedidos Online</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Touch friendly optimizations */
+        button, select, input {
+            touch-action: manipulation;
+        }
+        /* Hide scrollbar for category selector */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-stone-800 antialiased pb-24 md:pb-6 selection:bg-orange-200">
+
+    <!-- Top Navigation / Header -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-sm">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-orange-500 text-white p-2 rounded-2xl shadow-md shadow-orange-500/20">
+                    <i data-lucide="utensils-crossed" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-stone-900 leading-tight" id="header-store-name">Marmita Caseira da Mana</h1>
+                    <p class="text-xs text-stone-500 flex items-center gap-1 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Aberto para Pedidos
+                    </p>
+                </div>
+            </div>
+
+            <!-- Toggle View Mode Button -->
+            <button onclick="toggleAdminView()" id="view-mode-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 active:scale-95 transition-all">
+                <i data-lucide="shield-check" class="w-4 h-4 text-orange-600"></i>
+                <span id="view-mode-label">Painel Irmã</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- CLIENT VIEW -->
+    <main id="client-view" class="flex-1 max-w-md w-full mx-auto px-4 pt-4 pb-6 space-y-5">
+        
+        <!-- Prato do Dia Highlight -->
+        <section id="featured-section" class="hidden">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 to-amber-600 text-white p-5 shadow-lg shadow-orange-500/15">
+                <div class="absolute -right-4 -bottom-4 opacity-15">
+                    <i data-lucide="chef-hat" class="w-36 h-36"></i>
+                </div>
+                <span class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-2">
+                    <i data-lucide="sparkles" class="w-3 h-3 text-amber-300"></i> Destaque do Dia
+                </span>
+                <h2 id="featured-title" class="text-xl font-extrabold leading-snug">--</h2>
+                <p id="featured-desc" class="text-xs text-orange-100 mt-1 line-clamp-2">--</p>
+                <div class="mt-4 flex items-center justify-between">
+                    <span id="featured-price" class="text-lg font-black text-white">R$ 0,00</span>
+                    <button onclick="openModalFromFeatured()" class="bg-white text-orange-600 hover:bg-orange-50 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1">
+                        Montar Marmita <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filter -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-4 px-4">
+            <button onclick="filterCategory('todos')" class="cat-btn active border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-500/20" data-cat="todos">
+                🍲 Todos
+            </button>
+            <button onclick="filterCategory('Marmitas Tradicionais')" class="cat-btn border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-white text-stone-600 border-stone-200 hover:bg-stone-50" data-cat="Marmitas Tradicionais">
+                🍛 Tradicionais
+            </button>
+            <button onclick="filterCategory('Fit / Leve')" class="cat-btn border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-white text-stone-600 border-stone-200 hover:bg-stone-50" data-cat="Fit / Leve">
+                🥗 Fit / Leve
+            </button>
+            <button onclick="filterCategory('Bebidas')" class="cat-btn border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-white text-stone-600 border-stone-200 hover:bg-stone-50" data-cat="Bebidas">
+                🥤 Bebidas
+            </button>
+            <button onclick="filterCategory('Sobremesas')" class="cat-btn border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-white text-stone-600 border-stone-200 hover:bg-stone-50" data-cat="Sobremesas">
+                pudding Sobremesas
+            </button>
+        </div>
+
+        <!-- Menu List Grid -->
+        <div id="menu-grid" class="space-y-3">
+            <!-- Dynamic Items Loaded via JS -->
+        </div>
+
+    </main>
+
+    <!-- ADMIN VIEW (Hidden by Default) -->
+    <main id="admin-view" class="hidden flex-1 max-w-md w-full mx-auto px-4 pt-4 pb-6 space-y-6">
+        
+        <!-- Header Info Admin -->
+        <div class="bg-stone-900 text-white p-5 rounded-3xl space-y-3 shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-bold text-lg">Painel de Controle</h2>
+                    <p class="text-xs text-stone-400">Edite seu cardápio com 1 toque</p>
+                </div>
+                <span class="bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs px-2.5 py-1 rounded-full font-semibold">Irmã Admin</span>
+            </div>
+            
+            <!-- Quick Whatsapp Phone Config -->
+            <div class="pt-2 border-t border-stone-800 flex items-center justify-between text-xs">
+                <span class="text-stone-400">WhatsApp para receber:</span>
+                <input type="text" id="admin-phone-input" onchange="updatePhone(this.value)" class="bg-stone-800 text-amber-300 font-mono px-2 py-1 rounded-lg border border-stone-700 w-36 text-right focus:outline-none focus:border-orange-500" placeholder="5513999999999">
+            </div>
+        </div>
+
+        <!-- Action: Add New Item -->
+        <div class="flex justify-between items-center">
+            <h3 class="font-bold text-stone-900 text-base">Itens do Cardápio</h3>
+            <button onclick="openNewItemModal()" class="bg-orange-500 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm active:scale-95 transition-all hover:bg-orange-600">
+                <i data-lucide="plus" class="w-4 h-4"></i> Novo Prato
+            </button>
+        </div>
+
+        <!-- Admin Items List -->
+        <div id="admin-items-list" class="space-y-3">
+            <!-- Dynamic Admin Items Loaded via JS -->
+        </div>
+
+        <button onclick="resetDefaultMenu()" class="w-full py-3 text-xs font-semibold text-stone-400 hover:text-red-500 transition-colors">
+            🔄 Restaurar Cardápio Padrão de Exemplo
+        </button>
+    </main>
+
+    <!-- Floating Sticky Cart Bar (Mobile) -->
+    <div id="cart-floating-bar" class="fixed bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none">
+        <div class="max-w-md mx-auto pointer-events-auto">
+            <button onclick="openCartModal()" class="w-full bg-stone-900 hover:bg-stone-800 text-white p-4 rounded-2xl shadow-xl shadow-stone-900/20 flex items-center justify-between active:scale-[0.98] transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="relative bg-orange-500 text-white p-2 rounded-xl">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span id="cart-count-badge" class="absolute -top-1.5 -right-1.5 bg-white text-orange-600 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-stone-900">0</span>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-xs text-stone-400 font-medium">Ver Sacola</p>
+                        <p id="cart-total-preview" class="text-sm font-bold text-white">R$ 0,00</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 text-xs font-bold text-orange-400">
+                    Avançar <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 1: Customize Item / Add to Cart -->
+    <div id="modal-item" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-stone-100 flex items-center justify-between sticky top-0 bg-white z-10">
+                <h3 id="modal-title" class="font-bold text-stone-900 text-base">Personalizar Prato</h3>
+                <button onclick="closeModal('modal-item')" class="p-1.5 text-stone-400 hover:text-stone-600 rounded-full bg-stone-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-5 flex-1">
+                <p id="modal-desc" class="text-xs text-stone-500 leading-relaxed">--</p>
+
+                <!-- Size Selection (For Meals) -->
+                <div id="size-selection-box" class="space-y-2">
+                    <label class="block text-xs font-bold text-stone-900 uppercase tracking-wider">Escolha o Tamanho</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="border-2 border-orange-500 bg-orange-50/50 p-3 rounded-2xl text-center cursor-pointer transition-all size-option" onclick="selectSize('P', 0)">
+                            <input type="radio" name="size" value="P" checked class="hidden">
+                            <span class="block font-bold text-xs text-stone-900">Pequena (P)</span>
+                            <span class="text-[10px] text-stone-500 block mt-0.5" id="size-p-price">R$ 0,00</span>
+                        </label>
+                        <label class="border-2 border-stone-200 p-3 rounded-2xl text-center cursor-pointer transition-all size-option" onclick="selectSize('M', 3)">
+                            <input type="radio" name="size" value="M" class="hidden">
+                            <span class="block font-bold text-xs text-stone-900">Média (M)</span>
+                            <span class="text-[10px] text-stone-500 block mt-0.5" id="size-m-price">+R$ 3,00</span>
+                        </label>
+                        <label class="border-2 border-stone-200 p-3 rounded-2xl text-center cursor-pointer transition-all size-option" onclick="selectSize('G', 6)">
+                            <input type="radio" name="size" value="G" class="hidden">
+                            <span class="block font-bold text-xs text-stone-900">Grande (G)</span>
+                            <span class="text-[10px] text-stone-500 block mt-0.5" id="size-g-price">+R$ 6,00</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Custom Observation / Acompanhamentos -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-stone-900 uppercase tracking-wider">Observações / Retirar algo?</label>
+                    <textarea id="modal-obs" rows="2" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-stone-50/50" placeholder="Ex: Sem feijão, capricha na salada..."></textarea>
+                </div>
+
+                <!-- Quantity Controller -->
+                <div class="flex items-center justify-between pt-2">
+                    <span class="text-xs font-bold text-stone-900 uppercase tracking-wider">Quantidade</span>
+                    <div class="flex items-center gap-3 bg-stone-100 p-1.5 rounded-2xl">
+                        <button onclick="adjustModalQty(-1)" class="w-8 h-8 rounded-xl bg-white text-stone-800 font-bold flex items-center justify-center shadow-sm active:scale-95">-</button>
+                        <span id="modal-qty" class="font-bold text-sm text-stone-900 w-5 text-center">1</span>
+                        <button onclick="adjustModalQty(1)" class="w-8 h-8 rounded-xl bg-white text-stone-800 font-bold flex items-center justify-center shadow-sm active:scale-95">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-stone-100 bg-stone-50/50 rounded-b-3xl">
+                <button onclick="confirmAddToCart()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-orange-500/25 flex items-center justify-between active:scale-[0.98] transition-all">
+                    <span>Adicionar à Sacola</span>
+                    <span id="modal-final-price" class="bg-orange-600 px-2.5 py-1 rounded-xl text-xs font-black">R$ 0,00</span>
+                </button>
+            </div>
+        </div>
+    </div>
+<!-- Modal Footer -->
+            <div class="p-4 border-t border-stone-100 bg-stone-50/50 rounded-b-3xl">
+                <button onclick="confirmAddToCart()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-orange-500/25 flex items-center justify-between active:scale-[0.98] transition-all">
+                    <span>Adicionar à Sacola</span>
+                    <span id="modal-final-price" class="bg-orange-600 px-2.5 py-1 rounded-xl text-xs font-black">R$ 0,00</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Cart & Checkout -->
+    <div id="modal-cart" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-stone-100 flex items-center justify-between sticky top-0 bg-white z-10">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-orange-500"></i>
+                    <h3 class="font-bold text-stone-900 text-base">Sua Sacola</h3>
+                </div>
+                <button onclick="closeModal('modal-cart')" class="p-1.5 text-stone-400 hover:text-stone-600 rounded-full bg-stone-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-6 flex-1">
+                <!-- Cart Items List -->
+                <div id="cart-items-container" class="space-y-3">
+                    <!-- Dynamic Cart Items -->
+                </div>
+
+                <!-- Checkout Form -->
+                <div class="border-t border-stone-100 pt-4 space-y-3">
+                    <h4 class="font-bold text-xs text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-orange-500"></i> Dados da Entrega
+                    </h4>
+
+                    <div class="space-y-2">
+                        <input type="text" id="checkout-name" placeholder="Seu Nome Completo *" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-stone-50/50">
+                        <input type="text" id="checkout-address" placeholder="Endereço e Número *" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-stone-50/50">
+                        <input type="text" id="checkout-ref" placeholder="Ponto de Referência (opcional)" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-stone-50/50">
+                    </div>
+
+                    <h4 class="font-bold text-xs text-stone-900 uppercase tracking-wider pt-2 flex items-center gap-1.5">
+                        <i data-lucide="wallet" class="w-4 h-4 text-orange-500"></i> Forma de Pagamento
+                    </h4>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectPayment('PIX')" class="pay-btn active border-2 border-orange-500 bg-orange-50 text-orange-700 p-2.5 rounded-2xl text-center text-xs font-bold transition-all" data-pay="PIX">
+                            💚 PIX
+                        </button>
+                        <button type="button" onclick="selectPayment('Cartão')" class="pay-btn border-2 border-stone-200 bg-white text-stone-700 p-2.5 rounded-2xl text-center text-xs font-bold transition-all" data-pay="Cartão">
+                            💳 Cartão
+                        </button>
+                        <button type="button" onclick="selectPayment('Dinheiro')" class="pay-btn border-2 border-stone-200 bg-white text-stone-700 p-2.5 rounded-2xl text-center text-xs font-bold transition-all" data-pay="Dinheiro">
+                            💵 Dinheiro
+                        </button>
+                    </div>
+
+                    <!-- Troco (Conditional) -->
+                    <div id="troco-box" class="hidden pt-1">
+                        <input type="text" id="checkout-troco" placeholder="Troco para quanto? (Ex: R$ 50,00)" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-stone-50/50">
+                    </div>
+                </div>
+
+                <!-- Summary Breakdown -->
+                <div class="bg-stone-50 p-4 rounded-2xl space-y-2 border border-stone-100 text-xs">
+                    <div class="flex justify-between text-stone-500">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between text-stone-500">
+                        <span>Taxa de Entrega</span>
+                        <span class="text-emerald-600 font-semibold">A combinar</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-sm text-stone-900 pt-2 border-t border-stone-200">
+                        <span>Total dos Produtos</span>
+                        <span id="summary-total" class="text-orange-600 font-black">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit WhatsApp Button -->
+            <div class="p-4 border-t border-stone-100 bg-white sticky bottom-0">
+                <button onclick="sendOrderToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span>Enviar Pedido pelo WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Admin Add/Edit Item -->
+    <div id="modal-admin-item" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-y-auto max-h-[90vh] shadow-2xl">
+            <div class="p-4 border-b border-stone-100 flex items-center justify-between">
+                <h3 id="admin-modal-title" class="font-bold text-stone-900 text-base">Novo Prato</h3>
+                <button onclick="closeModal('modal-admin-item')" class="p-1.5 text-stone-400 hover:text-stone-600 rounded-full bg-stone-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveAdminItem(event)" class="p-5 space-y-4">
+                <input type="hidden" id="admin-item-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">Nome do Prato *</label>
+                    <input type="text" id="admin-item-title" required placeholder="Ex: Strogonoff de Frango" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500">
+                </div>
+<div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">Descrição / Acompanhamentos</label>
+                    <textarea id="admin-item-desc" rows="2" placeholder="Ex: Acompanha arroz branco, feijão e batata palha." class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Preço Base (P) *</label>
+                        <input type="number" step="0.50" id="admin-item-price" required placeholder="18.00" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Categoria</label>
+                        <select id="admin-item-category" class="w-full text-xs p-3 rounded-2xl border border-stone-200 focus:outline-none focus:border-orange-500 bg-white">
+                            <option value="Marmitas Tradicionais">Tradicionais</option>
+                            <option value="Fit / Leve">Fit / Leve</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Sobremesas">Sobremesas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Checkboxes -->
+                <div class="pt-2 space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="admin-item-featured" class="w-4 h-4 text-orange-500 rounded border-stone-300 focus:ring-orange-500">
+                        <span class="text-xs font-semibold text-stone-800">Marcar como "Prato do Dia" ⭐</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="admin-item-available" checked class="w-4 h-4 text-orange-500 rounded border-stone-300 focus:ring-orange-500">
+                        <span class="text-xs font-semibold text-stone-800">Em estoque / Disponível</span>
+                    </label>
+                </div>
+
+                <div class="pt-4 flex gap-2">
+                    <button type="button" onclick="closeModal('modal-admin-item')" class="w-1/2 py-3 rounded-2xl font-bold text-xs bg-stone-100 text-stone-600 hover:bg-stone-200">Cancelar</button>
+                    <button type="submit" class="w-1/2 py-3 rounded-2xl font-bold text-xs bg-orange-500 text-white hover:bg-orange-600 shadow-md shadow-orange-500/20">Salvar Prato</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Default Sample Menu Data
+        const DEFAULT_MENU = [
+            {
+                id: '1',
+                title: 'Bife a Parmegiana',
+                desc: 'Bife bovino empanado, coberto com molho caseiro e queijo derretido. Acompanha arroz e fritas.',
+                price: 22.00,
+                category: 'Marmitas Tradicionais',
+                featured: true,
+                available: true
+            },
+            {
+                id: '2',
+                title: 'Feijoada Completa',
+                desc: 'Acompanha arroz branco, couve refogada na manteiga, farofa caseira e torresmo crocante.',
+                price: 25.00,
+                category: 'Marmitas Tradicionais',
+                featured: false,
+                available: true
+            },
+            {
+                id: '3',
+                title: 'Frango Grelhado Fit',
+                desc: 'Filé de frango grelhado, arroz integral, feijão e salada colorida (alface, tomate e cenoura).',
+                price: 19.00,
+                category: 'Fit / Leve',
+                featured: false,
+                available: true
+            },
+            {
+                id: '4',
+                title: 'Pudim de Leite Condensado',
+                desc: 'Fatia individual do tradicional pudim caseiro com calda de caramelo.',
+                price: 7.00,
+                category: 'Sobremesas',
+                featured: false,
+                available: true
+            },
+            {
+                id: '5',
+                title: 'Guaraná Antarctica 350ml',
+                desc: 'Lata trincando de gelada.',
+                price: 6.00,
+                category: 'Bebidas',
+                featured: false,
+                available: true
+            }
+        ];
+
+        // State Management
+        let menuItems = [];
+        let cart = [];
+        let selectedCategory = 'todos';
+        let currentEditingItem = null;
+        let selectedSize = 'P';
+        let sizeExtraPrice = 0;
+        let modalQty = 1;
+        let selectedPaymentMethod = 'PIX';
+        let whatsappPhone = '5513997837501'; // Default Phone
+
+        // Initialize App
+        window.onload = function() {
+            loadState();
+            renderApp();
+            lucide.createIcons();
+        };
+
+        // Load data from LocalStorage
+        function loadState() {
+            const savedMenu = localStorage.getItem('marmita_menu');
+            if (savedMenu) {
+                menuItems = JSON.parse(savedMenu);
+            } else {
+                menuItems = [...DEFAULT_MENU];
+                saveMenuState();
+            }
+
+            const savedPhone = localStorage.getItem('marmita_phone');
+            if (savedPhone) {
+                whatsappPhone = savedPhone;
+            }
+            document.getElementById('admin-phone-input').value = whatsappPhone;
+        }
+
+        function saveMenuState() {
+            localStorage.setItem('marmita_menu', JSON.stringify(menuItems));
+        }
+
+        function updatePhone(val) {
+            whatsappPhone = val.replace(/\D/g, '');
+            localStorage.setItem('marmita_phone', whatsappPhone);
+        }
+
+        // Render Entire Application
+        function renderApp() {
+            renderFeatured();
+            renderClientMenu();
+            renderAdminList();
+            updateCartUI();
+        }
+
+        // Render Featured / Prato do Dia
+        function renderFeatured() {
+            const featured = menuItems.find(i => i.featured && i.available);
+            const section = document.getElementById('featured-section');
+            if (featured) {
+                document.getElementById('featured-title').innerText = featured.title;
+                document.getElementById('featured-desc').innerText = featured.desc;
+                document.getElementById('featured-price').innerText = formatCurrency(featured.price);
+                section.onclick = () => openItemModal(featured.id);
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        // Filter Categories
+        function filterCategory(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = "cat-btn active border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-500/20";
+                } else {
+                    btn.className = "cat-btn border px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all bg-white text-stone-600 border-stone-200 hover:bg-stone-50";
+                }
+            });
+            renderClientMenu();
+        }
+
+        // Render Client Menu Items Grid
+        function renderClientMenu() {
+            const container = document.getElementById('menu-grid');
+            container.innerHTML = '';
+
+            const filtered = selectedCategory === 'todos' 
+                ? menuItems 
+                : menuItems.filter(i => i.category === selectedCategory);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-stone-400 space-y-2">
+                        <i data-lucide="utensils" class="w-8 h-8 mx-auto opacity-50"></i>
+                        <p class="text-xs">Nenhum prato nesta categoria hoje.</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(item => {
+                const isDrinkOrDessert = item.category === 'Bebidas' || item.category === 'Sobremesas';
+                const el = document.createElement('div');
+                el.className = `bg-white p-4 rounded-3xl border border-stone-100 shadow-sm flex items-center justify-between gap-3 ${!item.available ? 'opacity-60 grayscale' : ''}`;
+                
+                el.innerHTML = `
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-stone-900 text-sm">${item.title}</h3>
+                            ${item.featured ? '<span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Prato do Dia</span>' : ''}
+                        </div>
+                        <p class="text-xs text-stone-500 line-clamp-2 leading-relaxed">${item.desc || 'Deliciosa refeição feita na hora.'}</p>
+                        <p class="text-sm font-black text-orange-600 pt-1">${formatCurrency(item.price)} ${!isDrinkOrDessert ? '<span class="text-[10px] text-stone-400 font-normal">(tam. P)</span>' : ''}</p>
+                    </div>
+                    <div>
+                        ${item.available ? `
+                            <button onclick="openItemModal('${item.id}')" class="bg-orange-50 hover:bg-orange-100 text-orange-600 p-3 rounded-2xl font-bold text-xs active:scale-95 transition-all flex items-center justify-center">
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                            </button>
+                        ` : `
+                            <span class="text-[10px] font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-xl">Esgotado</span>
+                        `}
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        // Modal Customization Item
+        function openItemModal(itemId) {
+            currentEditingItem = menuItems.find(i => i.id === itemId);
+            if (!currentEditingItem) return;
+
+            document.getElementById('modal-title').innerText = currentEditingItem.title;
+            document.getElementById('modal-desc').innerText = currentEditingItem.desc;
+            document.getElementById('modal-obs').value = '';
+            modalQty = 1;
+            document.getElementById('modal-qty').innerText = modalQty;
+
+            const isDrinkOrDessert = currentEditingItem.category === 'Bebidas' || currentEditingItem.category === 'Sobremesas';
+            const sizeBox = document.getElementById('size-selection-box');
+            
+            if (isDrinkOrDessert) {
+                sizeBox.classList.add('hidden');
+                selectedSize = 'Único';
+                sizeExtraPrice = 0;
+            } else {
+                sizeBox.classList.remove('hidden');
+                selectSize('P', 0);
+            }
+
+            updateModalPrice();
+            openModal('modal-item');
+        }
+
+        function selectSize(size, extra) {
+            selectedSize = size;
+            sizeExtraPrice = extra;
+            
+            document.querySelectorAll('.size-option').forEach(opt => {
+                opt.className = "border-2 border-stone-200 p-3 rounded-2xl text-center cursor-pointer transition-all size-option";
+            });
+            event.currentTarget.className = "border-2 border-orange-500 bg-orange-50/50 p-3 rounded-2xl text-center cursor-pointer transition-all size-option";
+            updateModalPrice();
+        }
+
+        function adjustModalQty(delta) {
+            modalQty = Math.max(1, modalQty + delta);
+            document.getElementById('modal-qty').innerText = modalQty;
+            updateModalPrice();
+        }
+
+        function updateModalPrice() {
+            if (!currentEditingItem) return;
+            const unitPrice = currentEditingItem.price + sizeExtraPrice;
+            const total = unitPrice * modalQty;
+            document.getElementById('modal-final-price').innerText = formatCurrency(total);
+        }
+
+        function confirmAddToCart() {
+            const obs = document.getElementById('modal-obs').value.trim();
+            const unitPrice = currentEditingItem.price + sizeExtraPrice;
+
+            cart.push({
+                cartId: Date.now().toString(),
+                id: currentEditingItem.id,
+                title: currentEditingItem.title,
+                size: selectedSize,
+                unitPrice: unitPrice,
+                qty: modalQty,
+                obs: obs
+            });
+
+            closeModal('modal-item');
+            updateCartUI();
+        }
+
+        // Cart State & UI Updates
+        function updateCartUI() {
+            const totalItems = cart.reduce((acc, i) => acc + i.qty, 0);
+            const totalPrice = cart.reduce((acc, i) => acc + (i.unitPrice * i.qty), 0);
+
+            document.getElementById('cart-count-badge').innerText = totalItems;
+            document.getElementById('cart-total-preview').innerText = formatCurrency(totalPrice);
+
+            const bar = document.getElementById('cart-floating-bar');
+            if (totalItems > 0) {
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function openCartModal() {
+            renderCartModalItems();
+            openModal('modal-cart');
+        }
+
+        function renderCartModalItems() {
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-stone-400 space-y-2">
+                        <i data-lucide="shopping-bag" class="w-8 h-8 mx-auto opacity-40"></i>
+                        <p class="text-xs">Sua sacola está vazia.</p>
+                    </div>`;
+                closeModal('modal-cart');
+                updateCartUI();
+                lucide.createIcons();
+                return;
+            }
+
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.unitPrice * item.qty;
+                subtotal += itemTotal;
+
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-2xl border border-stone-100";
+                el.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-bold text-xs text-stone-900">${item.title} ${item.size !== 'Único' ? `(${item.size})` : ''}</p>
+                        ${item.obs ? `<p class="text-[10px] text-stone-500 italic">Obs: ${item.obs}</p>` : ''}
+                        <p class="text-xs font-black text-orange-600 mt-1">${formatCurrency(itemTotal)}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 bg-white px-2 py-1 rounded-xl border border-stone-200">
+                            <button onclick="changeCartQty(${index}, -1)" class="text-stone-500 font-bold text-xs">-</button>
+                            <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                            <button onclick="changeCartQty(${index}, 1)" class="text-stone-500 font-bold text-xs">+</button>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+
+            document.getElementById('summary-subtotal').innerText = formatCurrency(subtotal);
+            document.getElementById('summary-total').innerText = formatCurrency(subtotal);
+            lucide.createIcons();
+        }
+
+        function changeCartQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            renderCartModalItems();
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCartModalItems();
+            updateCartUI();
+        }
+
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                if (btn.dataset.pay === method) {
+                    btn.className = "pay-btn active border-2 border-orange-500 bg-orange-50 text-orange-700 p-2.5 rounded-2xl text-center text-xs font-bold transition-all";
+                } else {
+                    btn.className = "pay-btn border-2 border-stone-200 bg-white text-stone-700 p-2.5 rounded-2xl text-center text-xs font-bold transition-all";
+                }
+            });
+
+            const trocoBox = document.getElementById('troco-box');
+            if (method === 'Dinheiro') {
+                trocoBox.classList.remove('hidden');
+            } else {
+                trocoBox.classList.add('hidden');
+            }
+        }
+
+        // WhatsApp Checkout Link Generation
+        function sendOrderToWhatsApp() {
+            const name = document.getElementById('checkout-name').value.trim();
+            const address = document.getElementById('checkout-address').value.trim();
+            const ref = document.getElementById('checkout-ref').value.trim();
+            const troco = document.getElementById('checkout-troco').value.trim();
+
+            if (!name || !address) {
+                alert('Por favor, preencha seu Nome e Endereço de entrega!');
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('Sua sacola está vazia!');
+                return;
+            }
+
+            let text = `*🛵 NOVO PEDIDO DE MARMITA*\n`;
+            text += `------------------------------------\n`;
+            text += `👤 *Cliente:* ${name}\n`;
+            text += `📍 *Endereço:* ${address}\n`;
+            if (ref) text += `🏠 *Ref:* ${ref}\n`;
+            text += `------------------------------------\n\n`;
+            text += `*📋 ITENS DO PEDIDO:*\n`;
+
+            let total = 0;
+            cart.forEach(item => {
+                const sub = item.unitPrice * item.qty;
+                total += sub;
+                text += `• ${item.qty}x ${item.title} ${item.size !== 'Único' ? `(${item.size})` : ''} - *${formatCurrency(sub)}*\n`;
+                if (item.obs) text += `   _Obs: ${item.obs}_\n`;
+            });
+
+            text += `\n------------------------------------\n`;
+            text += `💵 *Total dos Produtos:* ${formatCurrency(total)}\n`;
+            text += `💳 *Pagamento:* ${selectedPaymentMethod}\n`;
+            if (selectedPaymentMethod === 'Dinheiro' && troco) {
+                text += `🪙 *Troco para:* ${troco}\n`;
+            }
+            text += `------------------------------------\n`;
+            text += `Aguardando confirmação! Manda a chave PIX ou o tempo estimado de entrega, por favor! 😊`;
+
+            const encodedText = encodeURIComponent(text);
+            const targetPhone = whatsappPhone ? whatsappPhone : '5513997837501';
+            const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodedText}`;
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // ADMIN FUNCTIONS
+        function toggleAdminView() {
+            const clientView = document.getElementById('client-view');
+            const adminView = document.getElementById('admin-view');
+            const label = document.getElementById('view-mode-label');
+            const cartBar = document.getElementById('cart-floating-bar');
+
+            if (adminView.classList.contains('hidden')) {
+                adminView.classList.remove('hidden');
+                clientView.classList.add('hidden');
+                cartBar.classList.add('hidden');
+                label.innerText = 'Ver Cardápio';
+            } else {
+                adminView.classList.add('hidden');
+                clientView.classList.remove('hidden');
+                updateCartUI();
+                label.innerText = 'Painel Irmã';
+            }
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById('admin-items-list');
+            container.innerHTML = '';
+
+            menuItems.forEach(item => {
+                const el = document.createElement('div');
+                el.className = "bg-white p-4 rounded-3xl border border-stone-200 shadow-sm flex items-center justify-between gap-3";
+                el.innerHTML = `
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-stone-900 text-xs">${item.title}</h4>
+                            ${item.featured ? '<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded">Prato do Dia</span>' : ''}
+                        </div>
+                        <p class="text-[11px] text-stone-500">${formatCurrency(item.price)} - <span class="font-medium">${item.category}</span></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleItemStock('${item.id}')" class="px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${item.available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">
+                            ${item.available ? 'Disponível' : 'Esgotado'}
+                        </button>
+                        <button onclick="editAdminItem('${item.id}')" class="p-2 text-stone-500 hover:text-stone-800 bg-stone-100 rounded-xl">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteAdminItem('${item.id}')" class="p-2 text-red-400 hover:text-red-600 bg-red-50 rounded-xl">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        function openNewItemModal() {
+            document.getElementById('admin-modal-title').innerText = "Novo Prato";
+            document.getElementById('admin-item-id').value = "";
+            document.getElementById('admin-item-title').value = "";
+            document.getElementById('admin-item-desc').value = "";
+            document.getElementById('admin-item-price').value = "";
+            document.getElementById('admin-item-category').value = "Marmitas Tradicionais";
+            document.getElementById('admin-item-featured').checked = false;
+            document.getElementById('admin-item-available').checked = true;
+
+            openModal('modal-admin-item');
+        }
+
+        function editAdminItem(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('admin-modal-title').innerText = "Editar Prato";
+            document.getElementById('admin-item-id').value = item.id;
+            document.getElementById('admin-item-title').value = item.title;
+            document.getElementById('admin-item-desc').value = item.desc;
+            document.getElementById('admin-item-price').value = item.price;
+            document.getElementById('admin-item-category').value = item.category;
+            document.getElementById('admin-item-featured').checked = item.featured;
+            document.getElementById('admin-item-available').checked = item.available;
+
+            openModal('modal-admin-item');
+        }
+
+        function saveAdminItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('admin-item-id').value;
+            const title = document.getElementById('admin-item-title').value;
+            const desc = document.getElementById('admin-item-desc').value;
+            const price = parseFloat(document.getElementById('admin-item-price').value);
+            const category = document.getElementById('admin-item-category').value;
+            const featured = document.getElementById('admin-item-featured').checked;
+            const available = document.getElementById('admin-item-available').checked;
+
+            if (featured) {
+                // Remove featured from others
+                menuItems.forEach(i => i.featured = false);
+            }
+
+            if (id) {
+                // Edit
+                const index = menuItems.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    menuItems[index] = { id, title, desc, price, category, featured, available };
+                }
+            } else {
+                // New
+                menuItems.push({
+                    id: Date.now().toString(),
+                    title,
+                    desc,
+                    price,
+                    category,
+                    featured,
+                    available
+                });
+            }
+
+            saveMenuState();
+            renderApp();
+            closeModal('modal-admin-item');
+        }
+
+        function toggleItemStock(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (item) {
+                item.available = !item.available;
+                saveMenuState();
+                renderApp();
+            }
+        }
+
+        function deleteAdminItem(id) {
+            if (confirm('Tem certeza que deseja apagar este prato do cardápio?')) {
+                menuItems = menuItems.filter(i => i.id !== id);
+                saveMenuState();
+                renderApp();
+            }
+        }
+
+        function resetDefaultMenu() {
+            if (confirm('Restaurar o cardápio original de exemplo? As mudanças atuais serão perdidas.')) {
+                menuItems = [...DEFAULT_MENU];
+                saveMenuState();
+                renderApp();
+            }
+        }
+
+        // Helpers & UI Utils
+        function formatCurrency(val) {
+            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
+
+
