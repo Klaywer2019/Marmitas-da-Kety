@@ -153,7 +153,7 @@
     </div>
   </div>
 
-  <!-- Modal de Senha Admin -->
+  <!-- Modal de Senha Admin com Botão Olhinho -->
   <div id="password-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="card-dark w-full max-w-xs rounded-2xl p-5 space-y-4 border border-zinc-700 shadow-2xl">
       <div class="text-center">
@@ -164,7 +164,13 @@
         <p class="text-xs text-zinc-400 mt-0.5">Digite a senha para alterar o cardápio</p>
       </div>
       
-      <input type="password" id="admin-pass-input" placeholder="Sua senha" class="w-full text-sm bg-[#0f0f11] border border-[#27272a] rounded-xl p-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 text-center">
+      <!-- Input de senha com botão de ver/ocultar -->
+      <div class="relative">
+        <input type="password" id="admin-pass-input" placeholder="Sua senha" class="w-full text-sm bg-[#0f0f11] border border-[#27272a] rounded-xl p-2.5 pr-10 text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 text-center">
+        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
+          <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
+        </button>
+      </div>
       
       <div class="grid grid-cols-2 gap-2">
         <button onclick="closePasswordModal()" class="bg-[#27272a] text-zinc-400 text-xs font-medium py-2.5 rounded-xl">Cancelar</button>
@@ -215,7 +221,7 @@
 
   <script>
     const KETY_PHONE = "5513988831650";
-    // Senha simplificada e segura para evitar erros no celular
+    // Senha oficial da Kety atualizada com sucesso
     const ADMIN_PASS = "MarmitasdaKety1650";
 
     let selectedPaymentMethod = 'Pix';
@@ -270,7 +276,8 @@
           </div>
         `;
       });
-calculateTotal();
+
+      calculateTotal();
     }
 
     function updateQty(id, change) {
@@ -341,8 +348,7 @@ calculateTotal();
       orderText += `📍 *Endereço:* ${address}\n`;
       orderText += `💳 *Pagamento:* ${selectedPaymentMethod}\n`;
       if (obs) orderText += `📝 *Obs:* ${obs}\n`;
-
-      orderText += `\n*ITENS SELECIONADOS:*\n`;
+orderText += `\n*ITENS SELECIONADOS:*\n`;
 
       orderKeys.forEach(id => {
         const item = menuItems.find(i => i.id == id);
@@ -372,21 +378,41 @@ calculateTotal();
 
     function requestAdminAccess() {
       document.getElementById('admin-pass-input').value = '';
+      // Garante que o input volte a ser tipo password ao abrir
+      const passInput = document.getElementById('admin-pass-input');
+      passInput.type = "password";
+      document.getElementById('eye-icon').className = "fa-solid fa-eye text-xs";
+      
       document.getElementById('password-modal').classList.remove('hidden');
     }
 
     function closePasswordModal() {
+      // Limpa o campo de senha para nunca deixar valor guardado/visível ao cancelar
+      document.getElementById('admin-pass-input').value = '';
       document.getElementById('password-modal').classList.add('hidden');
     }
 
+    // Função do botão "Olhinho" para ver/esconder a senha
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById('admin-pass-input');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === "password") {
+        passInput.type = "text";
+        eyeIcon.className = "fa-solid fa-eye-slash text-xs text-orange-400";
+      } else {
+        passInput.type = "password";
+        eyeIcon.className = "fa-solid fa-eye text-xs";
+      }
+    }
+
     function validateAdminPassword() {
-      // .trim() remove espaços vazios acidentais que o celular adiciona
       const pass = document.getElementById('admin-pass-input').value.trim();
       if (pass === ADMIN_PASS) {
         closePasswordModal();
         openAdminModal();
       } else {
-        showAlert("Senha incorreta! A senha padrão é: kety123");
+        // Mensagem genérica segura (sem expor a senha)
+        showAlert("Senha incorreta! Tente novamente.");
       }
     }
 
