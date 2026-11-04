@@ -215,11 +215,11 @@
 
   <script>
     const KETY_PHONE = "5513988831650";
-    const ADMIN_PASS = "KethillynMarmitas1650";
+    // Senha simplificada e segura para evitar erros no celular
+    const ADMIN_PASS = "kety123";
 
     let selectedPaymentMethod = 'Pix';
 
-    // Inicia zerado ou carrega o menu editado salvo no localStorage
     let menuItems = JSON.parse(localStorage.getItem('kety_menu_dark')) || [];
     let cart = {};
 
@@ -229,7 +229,6 @@
       renderAdminList();
     }
 
-    // Calcula o valor unitário da marmita conforme a quantidade total do pedido
     function getUnitPrice(totalQty) {
       if (totalQty >= 15) return 16.50;
       if (totalQty >= 10) return 17.50;
@@ -271,8 +270,7 @@
           </div>
         `;
       });
-
-      calculateTotal();
+calculateTotal();
     }
 
     function updateQty(id, change) {
@@ -382,12 +380,13 @@
     }
 
     function validateAdminPassword() {
-      const pass = document.getElementById('admin-pass-input').value;
+      // .trim() remove espaços vazios acidentais que o celular adiciona
+      const pass = document.getElementById('admin-pass-input').value.trim();
       if (pass === ADMIN_PASS) {
         closePasswordModal();
         openAdminModal();
       } else {
-        showAlert("Senha incorreta! Apenas a Kety pode alterar o cardápio.");
+        showAlert("Senha incorreta! A senha padrão é: kety123");
       }
     }
 
@@ -420,7 +419,7 @@
             </div>
             <div class="flex items-center gap-1.5">
               <button onclick="editItem(${item.id})" class="text-orange-400 hover:text-orange-300 p-1.5 bg-[#18181c] border border-[#27272a] rounded-lg">
-      <i class="fa-solid fa-pen-to-square"></i>
+                <i class="fa-solid fa-pen-to-square"></i>
               </button>
               <button onclick="toggleItemActive(${item.id})" class="px-2 py-1 rounded-lg ${item.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-zinc-800 text-zinc-500'} font-medium text-[10px]">
                 ${item.active ? 'Ativo' : 'Pausado'}
