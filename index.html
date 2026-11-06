@@ -124,7 +124,7 @@
 
   </main>
 
-  <!-- Barra Fixa Inferior (Resumo e Envio) -->
+  <!-- Barra Fixa Inferior -->
   <div class="fixed bottom-0 left-0 right-0 bg-[#18181c] border-t border-[#27272a] p-3 z-30">
     <div class="max-w-md mx-auto flex items-center justify-between gap-3">
       <div>
@@ -140,20 +140,18 @@
     </div>
   </div>
 
-  <!-- Modal de Alerta / Mensagens -->
+  <!-- Modal Alerta -->
   <div id="custom-alert-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="card-dark w-full max-w-xs rounded-2xl p-5 text-center space-y-4 border border-zinc-700 shadow-2xl">
       <div class="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 mx-auto flex items-center justify-center text-xl">
         <i class="fa-solid fa-circle-exclamation"></i>
       </div>
       <p id="alert-message-text" class="text-sm font-medium text-zinc-200"></p>
-      <button onclick="closeAlert()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 rounded-xl transition">
-        Entendido
-      </button>
+      <button onclick="closeAlert()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 rounded-xl transition">Entendido</button>
     </div>
   </div>
 
-  <!-- Modal de Senha Admin com Botão Olhinho -->
+  <!-- Modal Senha Admin -->
   <div id="password-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="card-dark w-full max-w-xs rounded-2xl p-5 space-y-4 border border-zinc-700 shadow-2xl">
       <div class="text-center">
@@ -163,15 +161,12 @@
         <h3 class="font-bold text-white text-base">Acesso Restrito</h3>
         <p class="text-xs text-zinc-400 mt-0.5">Digite a senha para alterar o cardápio</p>
       </div>
-      
-      <!-- Input de senha com botão de ver/ocultar -->
       <div class="relative">
         <input type="password" id="admin-pass-input" placeholder="Sua senha" class="w-full text-sm bg-[#0f0f11] border border-[#27272a] rounded-xl p-2.5 pr-10 text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 text-center">
         <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
           <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
         </button>
       </div>
-      
       <div class="grid grid-cols-2 gap-2">
         <button onclick="closePasswordModal()" class="bg-[#27272a] text-zinc-400 text-xs font-medium py-2.5 rounded-xl">Cancelar</button>
         <button onclick="validateAdminPassword()" class="bg-orange-600 text-white text-xs font-bold py-2.5 rounded-xl">Entrar</button>
@@ -179,7 +174,7 @@
     </div>
   </div>
 
-  <!-- Modal Admin (Painel de Controle da Kety) -->
+  <!-- Modal Admin -->
   <div id="admin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="card-dark w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar border border-zinc-700">
       <div class="flex justify-between items-center border-b border-[#27272a] pb-3">
@@ -192,45 +187,49 @@
         </button>
       </div>
 
-      <!-- Formulário para Criar/Editar Prato -->
       <form id="add-item-form" onsubmit="saveItem(event)" class="space-y-2.5 bg-[#0f0f11] p-3.5 rounded-xl border border-[#27272a]">
         <h4 id="form-title" class="font-bold text-xs text-orange-400 uppercase tracking-wider">+ Cadastrar Prato da Semana</h4>
         <input type="hidden" id="editing-item-id" value="">
         <input type="text" id="item-title" placeholder="Nome do Prato (Ex: Strogonoff de Frango)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
-        <input type="text" id="item-desc" placeholder="Acompanhamentos (Ex: Arroz branco, batata palha)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
+        <input type="text" id="item-desc" placeholder="Acompanhamentos (Ex: Arroz, batata palha)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
         <div class="grid grid-cols-2 gap-2">
           <input type="number" step="0.01" id="item-price" placeholder="Preço Base (Ex: 19.50)" required class="text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
           <div class="flex gap-1">
             <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden w-1/3 bg-zinc-800 text-zinc-400 font-bold text-xs py-2.5 rounded-lg transition">X</button>
-            <button type="submit" id="save-btn" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 rounded-lg transition">
-              Salvar
-            </button>
+            <button type="submit" id="save-btn" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 rounded-lg transition">Salvar</button>
           </div>
         </div>
       </form>
 
-      <!-- Lista de Pratos do Cardápio -->
       <div class="space-y-2">
         <h4 class="font-bold text-xs text-zinc-400 uppercase tracking-wider">Opções Cadastradas</h4>
-        <div id="admin-items-list" class="space-y-2">
-          <!-- JS -->
-        </div>
+        <div id="admin-items-list" class="space-y-2"></div>
       </div>
     </div>
   </div>
 
   <script>
     const KETY_PHONE = "5513988831650";
-    // Senha oficial da Kety atualizada com sucesso
     const ADMIN_PASS = "MarmitasdaKety1650";
 
     let selectedPaymentMethod = 'Pix';
 
-    let menuItems = JSON.parse(localStorage.getItem('kety_menu_dark')) || [];
+    // Pratos fixos definidos pela Kety para esta semana
+    const defaultMenuItems = [
+      { id: 1, title: 'Panqueca de carne', desc: '2 Panquecas, arroz e batata palha', price: 19.50, active: true },
+      { id: 2, title: 'Strogonoff de frango', desc: 'Arroz e batata palha', price: 19.50, active: true }
+    ];
+
+    let menuItems = JSON.parse(localStorage.getItem('kety_menu_fixed_v2'));
+    if (!menuItems || menuItems.length === 0) {
+      menuItems = defaultMenuItems;
+      localStorage.setItem('kety_menu_fixed_v2', JSON.stringify(menuItems));
+    }
+
     let cart = {};
 
     function saveMenu() {
-      localStorage.setItem('kety_menu_dark', JSON.stringify(menuItems));
+      localStorage.setItem('kety_menu_fixed_v2', JSON.stringify(menuItems));
       renderMenu();
       renderAdminList();
     }
@@ -253,7 +252,6 @@
           <div class="card-dark p-6 rounded-2xl text-center space-y-2 border border-dashed border-zinc-700">
             <i class="fa-solid fa-utensils text-zinc-600 text-2xl"></i>
             <p class="text-xs text-zinc-400 font-medium">Nenhum prato disponível no cardápio no momento.</p>
-            <p class="text-[11px] text-zinc-500">Acesse o painel Admin para cadastrar as opções da semana!</p>
           </div>
         `;
         calculateTotal();
@@ -266,7 +264,8 @@
           <div class="card-dark p-4 rounded-2xl flex justify-between items-center gap-3">
             <div class="flex-1">
               <h3 class="font-bold text-white text-sm">${item.title}</h3>
-              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">${item.desc}</p>
+              <p class="text-xs text-zinc-400 mt-1">${item.desc}</p>
+              <p class="text-orange-400 font-bold text-xs mt-1">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
             </div>
             <div class="flex items-center bg-[#0f0f11] rounded-xl p-1 border border-[#27272a]">
               <button onclick="updateQty(${item.id}, -1)" class="w-8 h-8 rounded-lg bg-[#18181c] text-orange-400 font-bold hover:bg-[#27272a] transition flex items-center justify-center">-</button>
@@ -328,32 +327,29 @@
       const name = document.getElementById('client-name').value.trim();
       const address = document.getElementById('client-address').value.trim();
       const obs = document.getElementById('client-obs').value.trim();
-
       const orderKeys = Object.keys(cart);
 
       if (orderKeys.length === 0) {
         showAlert("Por favor, adicione pelo menos uma marmita ao seu pedido!");
         return;
       }
-
       if (!name || !address) {
         showAlert("Por favor, preencha seu Nome e Endereço de entrega!");
         return;
       }
 
       const { totalQty, unitPrice, totalAmount } = calculateTotal();
-
       let orderText = `*NOVO PEDIDO - MARMITAS DA KETY* 🍱\n\n`;
       orderText += `👤 *Cliente:* ${name}\n`;
       orderText += `📍 *Endereço:* ${address}\n`;
       orderText += `💳 *Pagamento:* ${selectedPaymentMethod}\n`;
       if (obs) orderText += `📝 *Obs:* ${obs}\n`;
-orderText += `\n*ITENS SELECIONADOS:*\n`;
 
+      orderText += `\n*ITENS SELECIONADOS:*\n`;
       orderKeys.forEach(id => {
         const item = menuItems.find(i => i.id == id);
         if (item) {
-          orderText += `• ${cart[id]}x ${item.title}\n`;
+          orderText += `• ${cart[id]}x ${item.title} (R$ ${item.price.toFixed(2).replace('.', ',')})\n`;
         }
       });
 
@@ -362,9 +358,7 @@ orderText += `\n*ITENS SELECIONADOS:*\n`;
       orderText += `\n💰 *VALOR TOTAL: R$ ${totalAmount.toFixed(2).replace('.', ',')}*`;
 
       const encodedMsg = encodeURIComponent(orderText);
-      const whatsappUrl = `https://wa.me/${KETY_PHONE}?text=${encodedMsg}`;
-
-      window.open(whatsappUrl, '_blank');
+      window.open(`https://wa.me/${KETY_PHONE}?text=${encodedMsg}`, '_blank');
     }
 
     function showAlert(msg) {
@@ -378,21 +372,16 @@ orderText += `\n*ITENS SELECIONADOS:*\n`;
 
     function requestAdminAccess() {
       document.getElementById('admin-pass-input').value = '';
-      // Garante que o input volte a ser tipo password ao abrir
-      const passInput = document.getElementById('admin-pass-input');
-      passInput.type = "password";
+      document.getElementById('admin-pass-input').type = "password";
       document.getElementById('eye-icon').className = "fa-solid fa-eye text-xs";
-      
       document.getElementById('password-modal').classList.remove('hidden');
     }
 
     function closePasswordModal() {
-      // Limpa o campo de senha para nunca deixar valor guardado/visível ao cancelar
       document.getElementById('admin-pass-input').value = '';
       document.getElementById('password-modal').classList.add('hidden');
     }
 
-    // Função do botão "Olhinho" para ver/esconder a senha
     function togglePasswordVisibility() {
       const passInput = document.getElementById('admin-pass-input');
       const eyeIcon = document.getElementById('eye-icon');
@@ -411,7 +400,6 @@ orderText += `\n*ITENS SELECIONADOS:*\n`;
         closePasswordModal();
         openAdminModal();
       } else {
-        // Mensagem genérica segura (sem expor a senha)
         showAlert("Senha incorreta! Tente novamente.");
       }
     }
@@ -434,8 +422,7 @@ orderText += `\n*ITENS SELECIONADOS:*\n`;
         list.innerHTML = `<p class="text-center text-zinc-500 py-4 text-xs">Nenhum prato cadastrado.</p>`;
         return;
       }
-
-      menuItems.forEach(item => {
+menuItems.forEach(item => {
         list.innerHTML += `
           <div class="flex items-center justify-between p-3 bg-[#0f0f11] rounded-xl border border-[#27272a] text-xs">
             <div class="flex-1 pr-2">
@@ -526,7 +513,6 @@ orderText += `\n*ITENS SELECIONADOS:*\n`;
       saveMenu();
     }
 
-    // Inicializar
     renderMenu();
   </script>
 </body>
