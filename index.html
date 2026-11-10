@@ -37,7 +37,7 @@
         <div>
           <h1 class="font-bold text-white text-base leading-tight">Marmitas da Kety</h1>
           <span class="text-xs text-emerald-400 flex items-center gap-1 font-medium">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Agenda Aberta (até sexta)
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Agenda Aberta (350g)
           </span>
         </div>
       </div>
@@ -55,7 +55,7 @@
       <div class="flex justify-between items-start mb-2">
         <div>
           <span class="bg-orange-500/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-orange-500/30">Tabela de Descontos</span>
-          <h2 class="text-sm font-bold text-white mt-1">Kits de Marmitas (350g)</h2>
+          <h2 class="text-sm font-bold text-white mt-1">Kits de Marmitas (350g)[span_3](start_span)[span_3](end_span)</h2>
         </div>
         <i class="fa-solid fa-box-open text-orange-500 text-xl"></i>
       </div>
@@ -84,7 +84,7 @@
     <!-- Seção de Cardápio da Semana -->
     <section>
       <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-        <i class="fa-solid fa-fire text-orange-500"></i> Cardápio da Semana
+        <i class="fa-solid fa-fire text-orange-500"></i> Cardápio da Semana[span_4](start_span)[span_4](end_span)
       </h2>
       <div id="menu-container" class="space-y-3">
         <!-- Renderizado dinamicamente via JS -->
@@ -173,8 +173,7 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal Admin -->
+<!-- Modal Admin -->
   <div id="admin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="card-dark w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar border border-zinc-700">
       <div class="flex justify-between items-center border-b border-[#27272a] pb-3">
@@ -190,10 +189,10 @@
       <form id="add-item-form" onsubmit="saveItem(event)" class="space-y-2.5 bg-[#0f0f11] p-3.5 rounded-xl border border-[#27272a]">
         <h4 id="form-title" class="font-bold text-xs text-orange-400 uppercase tracking-wider">+ Cadastrar Prato da Semana</h4>
         <input type="hidden" id="editing-item-id" value="">
-        <input type="text" id="item-title" placeholder="Nome do Prato (Ex: Strogonoff de Frango)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
-        <input type="text" id="item-desc" placeholder="Acompanhamentos (Ex: Arroz, batata palha)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
+        <input type="text" id="item-title" placeholder="Nome do Prato" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
+        <input type="text" id="item-desc" placeholder="Acompanhamentos (Ex: Arroz, feijão, legumes)" required class="w-full text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
         <div class="grid grid-cols-2 gap-2">
-          <input type="number" step="0.01" id="item-price" placeholder="Preço Base (Ex: 19.50)" required class="text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
+          <input type="number" step="0.01" id="item-price" placeholder="Preço (Ex: 19.50)" required class="text-xs bg-[#18181c] border border-[#27272a] rounded-lg p-2.5 text-white focus:outline-none focus:border-orange-500">
           <div class="flex gap-1">
             <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden w-1/3 bg-zinc-800 text-zinc-400 font-bold text-xs py-2.5 rounded-lg transition">X</button>
             <button type="submit" id="save-btn" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 rounded-lg transition">Salvar</button>
@@ -214,22 +213,22 @@
 
     let selectedPaymentMethod = 'Pix';
 
-    // Pratos fixos definidos pela Kety para esta semana
+    // Pratos fixos atualizados com base no cardápio oficial da Kety
     const defaultMenuItems = [
-      { id: 1, title: 'Panqueca de carne', desc: '2 Panquecas, arroz e batata palha', price: 19.50, active: true },
-      { id: 2, title: 'Strogonoff de frango', desc: 'Arroz e batata palha', price: 19.50, active: true }
+      { id: 1, title: 'Filé mignon suíno', desc: 'Arroz, feijão e legumes[span_5](start_span)[span_5](end_span)', price: 19.50, active: true },
+      { id: 2, title: 'Frango desfiado', desc: 'Arroz, feijão e legumes[span_6](start_span)[span_6](end_span)', price: 19.50, active: true }
     ];
 
-    let menuItems = JSON.parse(localStorage.getItem('kety_menu_fixed_v2'));
+    let menuItems = JSON.parse(localStorage.getItem('kety_menu_fixed_v3'));
     if (!menuItems || menuItems.length === 0) {
       menuItems = defaultMenuItems;
-      localStorage.setItem('kety_menu_fixed_v2', JSON.stringify(menuItems));
+      localStorage.setItem('kety_menu_fixed_v3', JSON.stringify(menuItems));
     }
 
     let cart = {};
 
     function saveMenu() {
-      localStorage.setItem('kety_menu_fixed_v2', JSON.stringify(menuItems));
+      localStorage.setItem('kety_menu_fixed_v3', JSON.stringify(menuItems));
       renderMenu();
       renderAdminList();
     }
@@ -422,7 +421,8 @@
         list.innerHTML = `<p class="text-center text-zinc-500 py-4 text-xs">Nenhum prato cadastrado.</p>`;
         return;
       }
-menuItems.forEach(item => {
+
+      menuItems.forEach(item => {
         list.innerHTML += `
           <div class="flex items-center justify-between p-3 bg-[#0f0f11] rounded-xl border border-[#27272a] text-xs">
             <div class="flex-1 pr-2">
@@ -445,8 +445,7 @@ menuItems.forEach(item => {
         `;
       });
     }
-
-    function saveItem(e) {
+function saveItem(e) {
       e.preventDefault();
       const idInput = document.getElementById('editing-item-id').value;
       const title = document.getElementById('item-title').value.trim();
